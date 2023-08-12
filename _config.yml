@@ -13,8 +13,12 @@ github_username:  jekyll
 
 # Build settings
 markdown: kramdown
-theme: jekyll-theme-minimal
-plugins:
 
 index_title: Data Index
 source: ./src
+
+sass:
+  style: compressed
+  sass_dir: _sass
+
+paginate: 100
