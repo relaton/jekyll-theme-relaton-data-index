@@ -11,8 +11,9 @@ module JekyllIndex
 
       collection.each do |item|
         doc = create_doc(item)
-        site.posts.docs << doc if doc
+        site.posts.docs << doc unless doc.nil?
       end
+      p "#{site.posts.docs}"
       site.site_payload['site']['favicon'] = site.config['jekyll-index']['favicon']
     end
 
