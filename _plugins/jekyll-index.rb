@@ -26,7 +26,7 @@ module JekyllIndex
       doc.content = hash['title'].first['content']
       doc.merge_data! data(item, hash)
       doc
-    rescue
+    rescue => e
       Jekyll.logger.error "Error during processing #{item[:file]}", e.message
       @processing_failed = true
     end
