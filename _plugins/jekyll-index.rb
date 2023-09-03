@@ -11,7 +11,6 @@ module JekyllIndex
 
       collection.each do |item|
         doc = create_doc(item)
-        p "#{doc}"
         unless doc.nil?
           site.posts.docs << doc
         end
