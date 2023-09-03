@@ -11,9 +11,11 @@ module JekyllIndex
 
       collection.each do |item|
         doc = create_doc(item)
-        site.posts.docs << doc unless doc.nil?
+        p "#{doc}"
+        unless doc.nil?
+          site.posts.docs << doc
+        end
       end
-      p "#{site.posts.docs}"
       site.site_payload['site']['favicon'] = site.config['jekyll-index']['favicon']
     end
 
@@ -27,6 +29,7 @@ module JekyllIndex
       doc
     rescue => e
       Jekyll.logger.warn "Error during processing #{item[:file]}, skipped.", e.message
+      nil
     end
 
     def data(item, hash)
