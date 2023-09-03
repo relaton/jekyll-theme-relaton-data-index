@@ -8,8 +8,14 @@ module JekyllIndex
 
     def generate(site)
       @site = site
+      @processing_failed = false
+
       collection.each { |item| site.posts.docs << create_doc(item) }
       site.site_payload['site']['favicon'] = site.config['jekyll-index']['favicon']
+
+      if @processing_failed
+        raise StandardError, "Generator failed due to errors in collection processing"
+      end
     end
 
     private
@@ -20,6 +26,9 @@ module JekyllIndex
       doc.content = hash['title'].first['content']
       doc.merge_data! data(item, hash)
       doc
+    rescue
+      Jekyll.logger.error "Error during processing #{item[:file]}", e.message
+      @processing_failed = true
     end
 
     def data(item, hash)
