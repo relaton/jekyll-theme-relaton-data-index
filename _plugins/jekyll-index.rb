@@ -46,12 +46,35 @@ module JekyllIndex
     end
 
     def reference(item, hash)
+      rendered = render_id(item[:id])
       if @site.config['jekyll-index']['add_type_to_reference']
         type = hash['docid'].find { |id| id['primary'] }['type']
-        "#{type} #{item[:id]}"
+        "#{type} #{rendered}"
       else
-        item[:id]
+        rendered
       end
+    end
+
+    # Render the index :id field. `Relaton::Index` stores it as a Hash for
+    # flavors that key the index by parts (e.g. relaton-w3c). To turn that
+    # back into a printable identifier we instantiate a flavor-supplied
+    # PubId class and call `to_s`. Flavor selection comes from per-data-repo
+    # config, so this plugin stays generic.
+    def render_id(id)
+      return id if id.is_a?(String)
+      return id.to_s unless id.is_a?(Hash)
+
+      klass = pubid_class
+      klass ? klass.new(**id).to_s : id.to_s
+    end
+
+    def pubid_class
+      return @pubid_class if defined?(@pubid_class)
+
+      config = @site.config['jekyll-index']
+      require config['pubid_require'] if config['pubid_require']
+      name = config['pubid_class']
+      @pubid_class = name ? Object.const_get(name) : nil
     end
 
     def collection
