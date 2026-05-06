@@ -33,23 +33,38 @@ module JekyllIndex
 
     def data(item, hash)
       date = date(hash)
-      stage = hash.dig('docstatus', 'stage', 'value') || date['type']
+      stage = hash.dig('docstatus', 'stage', 'value') || (date && date['type'])
       yaml_ref = "#{@site.config['jekyll-index']['baseurl']}#{item[:file]}"
       {
-        'ref' => reference(item, hash), 'doctype' => hash['doctype'], 'stage' => stage, 'date' => date['value'],
-        'yaml_ref' => yaml_ref
+        'ref' => reference(item, hash), 'doctype' => hash['doctype'], 'stage' => stage,
+        'date' => date_value(date), 'yaml_ref' => yaml_ref
       }
     end
 
+    # `relaton-bib` >= 2.x writes `at`; legacy data files use `value`.
+    def date_value(date)
+      date && (date['value'] || date['at'])
+    end
+
     def date(hash)
-      hash['date'].find { |d| d['type'] == 'published' } || hash['date'].first
+      dates = hash['date'] || []
+      dates.find { |d| d['type'] == 'published' } || dates.first
+    end
+
+    # Primary docidentifier. `relaton-bib` >= 2.x serializes as
+    # `docidentifier` with a `content` field; legacy data files use
+    # `docid` with an `id` field. Accept both.
+    def primary_docid(hash)
+      list = hash['docidentifier'] || hash['docid'] || []
+      list.find { |d| d['primary'] }
     end
 
     def reference(item, hash)
       rendered = render_id(item[:id])
       if @site.config['jekyll-index']['add_type_to_reference']
-        type = hash['docid'].find { |id| id['primary'] }['type']
-        "#{type} #{rendered}"
+        primary = primary_docid(hash)
+        type = primary && primary['type']
+        type ? "#{type} #{rendered}" : rendered
       else
         rendered
       end
