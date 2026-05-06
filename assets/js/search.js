@@ -154,6 +154,14 @@ document.addEventListener('DOMContentLoaded', () => {
     status.innerHTML = '';
   };
 
+  const showLoading = () => {
+    defaultArea.hidden = true;
+    filteredArea.innerHTML = '';
+    filteredArea.hidden = true;
+    status.hidden = false;
+    status.innerHTML = '<div class="search-loading">Loading search index&hellip;</div>';
+  };
+
   const showError = (message) => {
     defaultArea.hidden = true;
     filteredArea.innerHTML = '';
@@ -172,6 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (!index) showLoading();
+
     let data;
     try {
       data = await loadIndex();
@@ -181,11 +191,17 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    currentQuery = query;
+    const liveQuery = input.value.trim().toLowerCase();
+    if (!liveQuery) {
+      showDefault();
+      return;
+    }
+
+    currentQuery = liveQuery;
     matches = [];
     for (let i = 0; i < data.length; i++) {
       const ref = data[i].r;
-      if (ref && ref.toLowerCase().indexOf(query) !== -1) matches.push(data[i]);
+      if (ref && ref.toLowerCase().indexOf(liveQuery) !== -1) matches.push(data[i]);
     }
     currentPage = 1;
     renderResults();

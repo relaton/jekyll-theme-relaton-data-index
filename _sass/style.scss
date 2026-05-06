@@ -275,7 +275,8 @@ main {
   margin: 1rem 0;
 }
 
-.search-empty {
+.search-empty,
+.search-loading {
   padding: 1rem;
   color: #757575;
   font-size: 0.95em;
@@ -284,5 +285,22 @@ main {
   border: 1px dashed #e0e0e0;
   border-radius: 2px;
   margin: 1rem 0;
+}
+
+.search-loading::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  border: 2px solid #ccc;
+  border-top-color: #7e57c2;
+  border-radius: 50%;
+  animation: search-spin 0.8s linear infinite;
+}
+
+@keyframes search-spin {
+  to { transform: rotate(360deg); }
 }
 
