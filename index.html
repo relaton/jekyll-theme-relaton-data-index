@@ -20,39 +20,43 @@ layout: default
     <div class="input-field col s12">
       <i class="material-icons prefix">search</i>
       <input id="search-input" type="text" autocomplete="off"
-             placeholder="Filter documents on this page by identifier">
+             placeholder="Filter documents by identifier"
+             data-search-url="{{ '/search.json' | relative_url }}"
+             data-page-size="{{ site.paginate | default: 100 }}">
       <label for="search-input" class="active">Filter</label>
     </div>
   </div>
 
-  <div id="search-empty" class="search-empty" hidden>
-    No documents on this page match your filter. Try a different page or clear the filter.
+  <div id="search-status" class="search-status" hidden></div>
+
+  <div id="docs-default">
+    {% include pager.html %}
+
+    {% for post in paginator.posts %}
+      <div class="document row">
+        <div class="col s12 l7">
+          <h4 class="reference" style="display: inline-block;">{{ post.ref }}</h4>
+          <i class="tiny material-icons copy-reference deep-purple-text lighten-1-text" style="cursor: pointer;">content_copy</i>
+        </div>
+        <div class="col s12 l5">
+          <div class="doc-type {{ post.doctype }}">{{ post.doctype }}</div>
+          <div class="doc-stage">{{ post.stage }}</div>
+          <div class="doc-dates">
+            <div class="doc-updated">({{ post.date | date: "%Y-%m-%d" }})</div>
+          </div>
+          <div class="right">
+            <a target="_blank" href="{{ post.yaml_ref | relative_url }}">YAML</a>
+          </div>
+        </div>
+        <div class="col s12">
+          <h5>{{ post.content }}</h5>
+        </div>
+      </div>
+      <div class="divider"></div>
+    {% endfor %}
+
+    {% include pager.html %}
   </div>
 
-  {% include pager.html %}
-
-  {% for post in paginator.posts %}
-    <div class="document row">
-      <div class="col s12 l7">
-        <h4 class="reference" style="display: inline-block;">{{ post.ref }}</h4>
-        <i class="tiny material-icons copy-reference deep-purple-text lighten-1-text" style="cursor: pointer;">content_copy</i>
-      </div>
-      <div class="col s12 l5">
-        <div class="doc-type {{ post.doctype }}">{{ post.doctype }}</div>
-        <div class="doc-stage">{{ post.stage }}</div>
-        <div class="doc-dates">
-          <div class="doc-updated">({{ post.date | date: "%Y-%m-%d" }})</div>
-        </div>
-        <div class="right">
-          <a target="_blank" href="{{ post.yaml_ref | relative_url }}">YAML</a>
-        </div>
-      </div>
-      <div class="col s12">
-        <h5>{{ post.content }}</h5>
-      </div>
-    </div>
-    <div class="divider"></div>
-  {% endfor %}
-
-  {% include pager.html %}
+  <div id="docs-filtered" hidden></div>
 </div>
