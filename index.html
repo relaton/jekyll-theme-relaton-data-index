@@ -16,6 +16,17 @@ layout: default
 </div>
 
 <div class="container">
+  <div class="row search-row">
+    <div class="input-field col s12">
+      <i class="material-icons prefix">search</i>
+      <input id="search-input" type="text" autocomplete="off"
+             placeholder="Search by document identifier"
+             data-search-url="{{ '/search.json' | relative_url }}">
+      <label for="search-input" class="active">Search</label>
+      <div id="search-results" class="search-results" hidden></div>
+    </div>
+  </div>
+
   {% include pager.html %}
 
   {% for post in paginator.posts %}
