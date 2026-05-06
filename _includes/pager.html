@@ -1,3 +1,11 @@
+{% assign window = 3 %}
+{% assign current = paginator.page %}
+{% assign total = paginator.total_pages %}
+
+{% assign window_start = current | minus: window %}
+{% if window_start < 1 %}{% assign window_start = 1 %}{% endif %}
+{% assign window_end = current | plus: window %}
+{% if window_end > total %}{% assign window_end = total %}{% endif %}
 
 <div class="center-align">
   <ul class="pagination">
@@ -14,8 +22,19 @@
       </a>
     </li>
 
-    {% for page in (1..paginator.total_pages) %}
-      {% if page == paginator.page %}
+    {% if window_start > 1 %}
+      {% if current == 1 %}
+        <li class="active"><a href="#!">1</a></li>
+      {% else %}
+        <li class="waves-effect"><a href="{{ '/' | relative_url }}">1</a></li>
+      {% endif %}
+      {% if window_start > 2 %}
+        <li class="disabled"><a href="#!">&hellip;</a></li>
+      {% endif %}
+    {% endif %}
+
+    {% for page in (window_start..window_end) %}
+      {% if page == current %}
         {% assign page_class = 'active' %}
         {% assign page_url = '#!' %}
       {% elsif page == 1 %}
@@ -29,6 +48,15 @@
         <a href="{{ page_url }}">{{ page }}</a>
       </li>
     {% endfor %}
+
+    {% assign last_minus_one = total | minus: 1 %}
+    {% if window_end < total %}
+      {% if window_end < last_minus_one %}
+        <li class="disabled"><a href="#!">&hellip;</a></li>
+      {% endif %}
+      {% assign last_url = site.paginate_path | relative_url | replace: ':num', total %}
+      <li class="waves-effect"><a href="{{ last_url }}">{{ total }}</a></li>
+    {% endif %}
 
     {% if paginator.next_page %}
       {% assign next_class = 'waves-effect' %}
