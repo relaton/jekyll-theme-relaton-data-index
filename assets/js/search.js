@@ -1,94 +1,42 @@
 document.addEventListener('DOMContentLoaded', () => {
   const input = document.getElementById('search-input');
-  const results = document.getElementById('search-results');
-  if (!input || !results) return;
+  if (!input) return;
 
-  const searchUrl = input.dataset.searchUrl;
-  const maxResults = 50;
+  const empty = document.getElementById('search-empty');
+  const docs = Array.from(document.querySelectorAll('.document'));
+  const refs = docs.map((d) => {
+    const ref = d.querySelector('.reference');
+    return ref ? ref.textContent.trim().toLowerCase() : '';
+  });
 
-  let index = null;
-  let pending = null;
-
-  const loadIndex = () => {
-    if (index) return Promise.resolve(index);
-    if (pending) return pending;
-    pending = fetch(searchUrl)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to load search index: ' + response.status);
-        }
-        return response.json();
-      })
-      .then((data) => { index = data; return data; })
-      .catch((err) => { pending = null; throw err; });
-    return pending;
+  const dividerFor = (doc) => {
+    const next = doc.nextElementSibling;
+    return next && next.classList.contains('divider') ? next : null;
   };
 
-  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  }[c]));
-
-  const render = (matches, total) => {
-    if (!matches.length) {
-      results.innerHTML = '<div class="search-empty">No matches</div>';
-    } else {
-      const items = matches.map((m) => (
-        '<a class="search-result" href="' + escapeHtml(m.u) + '" target="_blank">' +
-          '<span class="search-result-ref">' + escapeHtml(m.r) + '</span>' +
-        '</a>'
-      ));
-      let html = items.join('');
-      if (total > matches.length) {
-        html += '<div class="search-more">Showing ' + matches.length + ' of ' + total + ' matches. Refine your query.</div>';
-      }
-      results.innerHTML = html;
-    }
-    results.hidden = false;
-  };
-
-  const update = async () => {
+  const update = () => {
     const query = input.value.trim().toLowerCase();
-    if (!query) {
-      results.hidden = true;
-      results.innerHTML = '';
-      return;
+    let visible = 0;
+    for (let i = 0; i < docs.length; i++) {
+      const match = !query || refs[i].indexOf(query) !== -1;
+      docs[i].hidden = !match;
+      const divider = dividerFor(docs[i]);
+      if (divider) divider.hidden = !match;
+      if (match) visible++;
     }
-    try {
-      const data = await loadIndex();
-      let total = 0;
-      const matches = [];
-      for (let i = 0; i < data.length; i++) {
-        const ref = data[i].r;
-        if (ref && ref.toLowerCase().indexOf(query) !== -1) {
-          total++;
-          if (matches.length < maxResults) matches.push(data[i]);
-        }
-      }
-      render(matches, total);
-    } catch (err) {
-      results.innerHTML = '<div class="search-empty">Search unavailable</div>';
-      results.hidden = false;
-      console.error(err);
-    }
+    if (empty) empty.hidden = !query || visible > 0;
   };
 
   let debounceId = null;
   input.addEventListener('input', () => {
     clearTimeout(debounceId);
-    debounceId = setTimeout(update, 120);
-  });
-  input.addEventListener('focus', () => { loadIndex().catch(() => {}); });
-
-  document.addEventListener('click', (e) => {
-    if (!input.contains(e.target) && !results.contains(e.target)) {
-      results.hidden = true;
-    }
+    debounceId = setTimeout(update, 80);
   });
 
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      results.hidden = true;
-      input.blur();
+      input.value = '';
+      update();
     }
   });
 });

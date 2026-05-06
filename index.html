@@ -20,11 +20,13 @@ layout: default
     <div class="input-field col s12">
       <i class="material-icons prefix">search</i>
       <input id="search-input" type="text" autocomplete="off"
-             placeholder="Search by document identifier"
-             data-search-url="{{ '/search.json' | relative_url }}">
-      <label for="search-input" class="active">Search</label>
-      <div id="search-results" class="search-results" hidden></div>
+             placeholder="Filter documents on this page by identifier">
+      <label for="search-input" class="active">Filter</label>
     </div>
+  </div>
+
+  <div id="search-empty" class="search-empty" hidden>
+    No documents on this page match your filter. Try a different page or clear the filter.
   </div>
 
   {% include pager.html %}
