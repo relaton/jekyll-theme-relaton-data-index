@@ -38,10 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const s = doc.s || '';
     const d = doc.d || '';
     const u = doc.u || '#!';
+    const c = doc.c || '';
     return (
       '<div class="document row">' +
         '<div class="col s12 l7">' +
           '<h4 class="reference" style="display: inline-block;">' + escapeHtml(doc.r) + '</h4>' +
+          '<i class="tiny material-icons copy-reference deep-purple-text lighten-1-text" style="cursor: pointer;">content_copy</i>' +
         '</div>' +
         '<div class="col s12 l5">' +
           '<div class="doc-type ' + escapeHtml(t) + '">' + escapeHtml(t) + '</div>' +
@@ -52,6 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
           '<div class="right">' +
             '<a target="_blank" href="' + escapeHtml(u) + '">YAML</a>' +
           '</div>' +
+        '</div>' +
+        '<div class="col s12">' +
+          '<h5>' + escapeHtml(c) + '</h5>' +
         '</div>' +
       '</div>' +
       '<div class="divider"></div>'
