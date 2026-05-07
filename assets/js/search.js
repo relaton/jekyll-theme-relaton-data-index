@@ -7,14 +7,24 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!status || !defaultArea || !filteredArea) return;
 
   const searchUrl = input.dataset.searchUrl;
-  const pageSize = Math.max(1, parseInt(input.dataset.pageSize, 10) || 100);
+  const staticPageSize = Math.max(1, parseInt(input.dataset.pageSize, 10) || 100);
   const pagerWindow = 3;
 
   let index = null;
   let pending = null;
-  let matches = [];
+  let activeList = null;
   let currentPage = 1;
   let currentQuery = '';
+  let rowsPerPage = computeRowsPerPage();
+
+  function computeRowsPerPage() {
+    const h = (typeof window !== 'undefined' && window.innerHeight) || 900;
+    if (h < 600) return 10;
+    if (h < 800) return 15;
+    if (h < 1000) return 25;
+    if (h < 1300) return 40;
+    return 60;
+  }
 
   const escapeHtml = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -74,7 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
   );
 
   const renderPager = (current, total) => {
-    if (total <= 0) return '';
+    if (total <= 1) {
+      if (total <= 0) return '';
+      return '<div class="center-align"><ul class="pagination">' +
+        '<li class="active"><a href="#!">1</a></li>' +
+        '</ul></div>';
+    }
     let html = '<div class="center-align"><ul class="pagination">';
 
     if (current > 1) {
@@ -118,8 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return html;
   };
 
-  const renderResults = () => {
-    if (!matches.length) {
+  const render = () => {
+    const list = activeList;
+    if (!list) return;
+
+    if (currentQuery && list.length === 0) {
       filteredArea.innerHTML = '';
       filteredArea.hidden = true;
       defaultArea.hidden = true;
@@ -129,59 +147,68 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const totalPages = Math.max(1, Math.ceil(matches.length / pageSize));
+    const totalPages = Math.max(1, Math.ceil(list.length / rowsPerPage));
     if (currentPage > totalPages) currentPage = totalPages;
     if (currentPage < 1) currentPage = 1;
 
-    const start = (currentPage - 1) * pageSize;
-    const slice = matches.slice(start, start + pageSize);
-
+    const start = (currentPage - 1) * rowsPerPage;
+    const slice = list.slice(start, start + rowsPerPage);
     const pager = renderPager(currentPage, totalPages);
     const rows = slice.map(renderRow).join('');
     filteredArea.innerHTML = pager + rows + pager;
     filteredArea.hidden = false;
     defaultArea.hidden = true;
 
-    status.hidden = false;
-    status.innerHTML =
-      '<div class="search-info">' +
-        matches.length + ' match' + (matches.length === 1 ? '' : 'es') +
-        ' for &ldquo;' + escapeHtml(currentQuery) + '&rdquo; — page ' +
-        currentPage + ' of ' + totalPages +
-      '</div>';
-  };
-
-  const showDefault = () => {
-    filteredArea.innerHTML = '';
-    filteredArea.hidden = true;
-    defaultArea.hidden = false;
-    status.hidden = true;
-    status.innerHTML = '';
+    if (currentQuery) {
+      status.hidden = false;
+      status.innerHTML =
+        '<div class="search-info">' +
+          list.length + ' match' + (list.length === 1 ? '' : 'es') +
+          ' for &ldquo;' + escapeHtml(currentQuery) + '&rdquo; — page ' +
+          currentPage + ' of ' + totalPages +
+        '</div>';
+    } else {
+      status.hidden = true;
+      status.innerHTML = '';
+    }
   };
 
   const showLoading = () => {
-    defaultArea.hidden = true;
-    filteredArea.innerHTML = '';
-    filteredArea.hidden = true;
     status.hidden = false;
-    status.innerHTML = '<div class="search-loading">Loading search index&hellip;</div>';
+    status.innerHTML = '<div class="search-loading">Loading index&hellip;</div>';
   };
 
   const showError = (message) => {
-    defaultArea.hidden = true;
+    defaultArea.hidden = false;
     filteredArea.innerHTML = '';
     filteredArea.hidden = true;
     status.hidden = false;
     status.innerHTML = '<div class="search-empty">' + escapeHtml(message) + '</div>';
   };
 
+  const initialPageFromUrl = () => {
+    const m = window.location.pathname.match(/page(\d+)\/?$/);
+    const staticPage = m ? Math.max(1, parseInt(m[1], 10)) : 1;
+    const startIndex = (staticPage - 1) * staticPageSize;
+    return Math.floor(startIndex / rowsPerPage) + 1;
+  };
+
   const runFilter = async () => {
     const query = input.value.trim().toLowerCase();
+
     if (!query) {
       currentQuery = '';
-      matches = [];
-      currentPage = 1;
-      showDefault();
+      activeList = index;
+      if (!activeList) {
+        try {
+          activeList = await loadIndex();
+        } catch (err) {
+          showError('Index failed to load.');
+          return;
+        }
+      }
+      currentPage = initialPageFromUrl();
+      render();
       return;
     }
 
@@ -192,32 +219,51 @@ document.addEventListener('DOMContentLoaded', () => {
       data = await loadIndex();
     } catch (err) {
       console.error(err);
-      showError('Search index failed to load.');
+      showError('Index failed to load.');
       return;
     }
 
     const liveQuery = input.value.trim().toLowerCase();
     if (!liveQuery) {
-      showDefault();
+      currentQuery = '';
+      activeList = data;
+      currentPage = initialPageFromUrl();
+      render();
       return;
     }
 
     currentQuery = liveQuery;
-    matches = [];
+    const matches = [];
     for (let i = 0; i < data.length; i++) {
       const ref = data[i].r;
       if (ref && ref.toLowerCase().indexOf(liveQuery) !== -1) matches.push(data[i]);
     }
+    activeList = matches;
     currentPage = 1;
-    renderResults();
+    render();
   };
+
+  // Initial render: take over from the static list as soon as the index is ready.
+  showLoading();
+  loadIndex()
+    .then((data) => {
+      activeList = data;
+      currentPage = initialPageFromUrl();
+      render();
+    })
+    .catch((err) => {
+      console.error(err);
+      // Leave the static fallback visible.
+      defaultArea.hidden = false;
+      filteredArea.hidden = true;
+      status.hidden = true;
+    });
 
   let debounceId = null;
   input.addEventListener('input', () => {
     clearTimeout(debounceId);
     debounceId = setTimeout(runFilter, 120);
   });
-  input.addEventListener('focus', () => { loadIndex().catch(() => {}); });
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       input.value = '';
@@ -232,7 +278,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const page = parseInt(link.dataset.filterPage, 10);
     if (!Number.isFinite(page)) return;
     currentPage = page;
-    renderResults();
+    render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  let resizeId = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeId);
+    resizeId = setTimeout(() => {
+      const next = computeRowsPerPage();
+      if (next === rowsPerPage || !activeList) return;
+      const topIndex = (currentPage - 1) * rowsPerPage;
+      rowsPerPage = next;
+      currentPage = Math.floor(topIndex / rowsPerPage) + 1;
+      render();
+    }, 200);
   });
 });
