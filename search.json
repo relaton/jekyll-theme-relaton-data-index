@@ -3,4 +3,4 @@ layout: null
 permalink: /search.json
 sitemap: false
 ---
-[{% for post in site.posts %}{"r":{{ post.ref | jsonify }},"u":{{ post.yaml_ref | relative_url | jsonify }},"t":{{ post.doctype | jsonify }},"s":{{ post.stage | jsonify }},"d":{{ post.date | date: "%Y-%m-%d" | jsonify }}}{% unless forloop.last %},{% endunless %}{% endfor %}]
+[{% for post in site.posts %}{"r":{{ post.ref | jsonify }},"u":{{ post.yaml_ref | relative_url | jsonify }},"t":{{ post.doctype | jsonify }},"s":{{ post.stage | jsonify }},"d":{{ post.date | date: "%Y-%m-%d" | jsonify }},"c":{{ post.content | jsonify }}}{% unless forloop.last %},{% endunless %}{% endfor %}]

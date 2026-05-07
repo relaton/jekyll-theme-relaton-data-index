@@ -6,17 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltip.close();
       tooltip.destroy();
     }, 1000);
-  }
+  };
 
-  const copyReference = (event) => {
-    const button = event.target;
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('.copy-reference');
+    if (!button) return;
+    const ref = button.parentElement.querySelector('.reference');
+    if (!ref) return;
     const tooltip = M.Tooltip.init(button, opts);
     showTooltip(tooltip);
-    const ref = button.parentElement.querySelector('.reference');
     navigator.clipboard.writeText(ref.innerText);
-  }
-
-  document.querySelectorAll('.copy-reference').forEach((btn) => {
-    btn.addEventListener('click', copyReference);
   });
 });
