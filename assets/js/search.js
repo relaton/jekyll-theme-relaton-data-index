@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
       '<div class="document row">' +
         '<div class="col s12 l7">' +
           '<h4 class="reference" style="display: inline-block;">' + escapeHtml(doc.r) + '</h4>' +
-          '<i class="tiny material-icons copy-reference deep-purple-text lighten-1-text" style="cursor: pointer;">content_copy</i>' +
+          '<i class="tiny material-icons copy-reference" style="cursor: pointer;">content_copy</i>' +
         '</div>' +
         '<div class="col s12 l5">' +
           '<div class="doc-type ' + escapeHtml(t) + '">' + escapeHtml(t) + '</div>' +
