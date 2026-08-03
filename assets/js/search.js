@@ -235,8 +235,13 @@ document.addEventListener('DOMContentLoaded', () => {
     currentQuery = liveQuery;
     const matches = [];
     for (let i = 0; i < data.length; i++) {
-      const ref = data[i].r;
-      if (ref && ref.toLowerCase().indexOf(liveQuery) !== -1) matches.push(data[i]);
+      const row = data[i];
+      const ref = row.r;
+      const title = row.c;
+      if ((ref && ref.toLowerCase().indexOf(liveQuery) !== -1) ||
+          (title && title.toLowerCase().indexOf(liveQuery) !== -1)) {
+        matches.push(row);
+      }
     }
     activeList = matches;
     currentPage = 1;

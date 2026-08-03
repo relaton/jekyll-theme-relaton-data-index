@@ -20,7 +20,7 @@ layout: default
     <div class="input-field col s12">
       <i class="material-icons prefix">search</i>
       <input id="search-input" type="text" autocomplete="off"
-             placeholder="Filter documents by identifier"
+             placeholder="Filter documents by identifier or title"
              data-search-url="{{ '/search.json' | relative_url }}"
              data-page-size="{{ site.paginate | default: 100 }}">
       <label for="search-input" class="active">Filter</label>
