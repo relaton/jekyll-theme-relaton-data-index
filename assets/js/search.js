@@ -43,6 +43,23 @@ document.addEventListener('DOMContentLoaded', () => {
     return pending;
   };
 
+  // Icons inlined from _includes/copy.svg and _includes/pager.html so the
+  // filtered view is pixel-identical to the server-rendered one.
+  const COPY_ICON =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<rect x="9" y="9" width="12" height="12" rx="2"/>' +
+    '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+
+  const chevron = (d) =>
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"/></svg>';
+
+  const CHEVRON_LEFT = chevron('M15 18l-6-6 6-6');
+  const CHEVRON_RIGHT = chevron('M9 18l6-6-6-6');
+
+  // Mirrors the `{% for post in paginator.posts %}` markup in index.html.
+  // Any change here must be made there too, and vice versa.
   const renderRow = (doc) => {
     const t = doc.t || '';
     const s = doc.s || '';
@@ -50,52 +67,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const u = doc.u || '#!';
     const c = doc.c || '';
     return (
-      '<div class="document row">' +
-        '<div class="col s12 l7">' +
-          '<h4 class="reference" style="display: inline-block;">' + escapeHtml(doc.r) + '</h4>' +
-          '<i class="tiny material-icons copy-reference" style="cursor: pointer;">content_copy</i>' +
-        '</div>' +
-        '<div class="col s12 l5">' +
-          '<div class="doc-type ' + escapeHtml(t) + '">' + escapeHtml(t) + '</div>' +
-          '<div class="doc-stage">' + escapeHtml(s) + '</div>' +
-          '<div class="doc-dates">' +
-            (d ? '<div class="doc-updated">(' + escapeHtml(d) + ')</div>' : '') +
+      '<article class="doc-row">' +
+        '<div class="doc-main">' +
+          '<div class="doc-id-line">' +
+            '<h2 class="reference">' + escapeHtml(doc.r) + '</h2>' +
+            '<button type="button" class="copy-reference" aria-label="Copy identifier" ' +
+              'title="Copy identifier">' + COPY_ICON + '</button>' +
           '</div>' +
-          '<div class="right">' +
-            '<a target="_blank" href="' + escapeHtml(u) + '">YAML</a>' +
-          '</div>' +
+          '<p class="doc-title">' + escapeHtml(c) + '</p>' +
         '</div>' +
-        '<div class="col s12">' +
-          '<h5>' + escapeHtml(c) + '</h5>' +
+        '<div class="doc-meta">' +
+          (t ? '<span class="doc-type ' + escapeHtml(t) + '">' + escapeHtml(t) + '</span>' : '') +
+          (s ? '<span class="doc-stage ' + escapeHtml(s) + '">' + escapeHtml(s) + '</span>' : '') +
+          (d ? '<time class="doc-date">' + escapeHtml(d) + '</time>' : '') +
+          '<a class="doc-yaml" target="_blank" rel="noopener" href="' + escapeHtml(u) + '">YAML</a>' +
         '</div>' +
-      '</div>' +
-      '<div class="divider"></div>'
+      '</article>'
     );
   };
 
-  const pagerLink = (page, label, classes) => (
-    '<li class="' + classes + '">' +
-      '<a href="#!" data-filter-page="' + page + '">' + label + '</a>' +
-    '</li>'
+  const pagerLink = (page, label, extra) => (
+    '<a class="pager-item" href="#!" data-filter-page="' + page + '"' + (extra || '') + '>' + label + '</a>'
   );
 
   const pagerDisabled = (label) => (
-    '<li class="disabled"><a href="#!">' + label + '</a></li>'
+    '<span class="pager-item disabled" aria-hidden="true">' + label + '</span>'
   );
 
+  const pagerCurrent = (page) => (
+    '<span class="pager-item active" aria-current="page">' + page + '</span>'
+  );
+
+  // Mirrors _includes/pager.html.
   const renderPager = (current, total) => {
     if (total <= 1) {
       if (total <= 0) return '';
-      return '<div class="center-align"><ul class="pagination">' +
-        '<li class="active"><a href="#!">1</a></li>' +
-        '</ul></div>';
+      return '<nav class="pager" aria-label="Pagination">' + pagerCurrent(1) + '</nav>';
     }
-    let html = '<div class="center-align"><ul class="pagination">';
+    let html = '<nav class="pager" aria-label="Pagination">';
 
     if (current > 1) {
-      html += pagerLink(current - 1, '<i class="material-icons">chevron_left</i>', 'waves-effect');
+      html += pagerLink(current - 1, CHEVRON_LEFT, ' aria-label="Previous page"');
     } else {
-      html += pagerDisabled('<i class="material-icons">chevron_left</i>');
+      html += pagerDisabled(CHEVRON_LEFT);
     }
 
     const windowStart = Math.max(1, current - pagerWindow);
@@ -103,33 +117,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (windowStart > 1) {
       if (current === 1) {
-        html += '<li class="active"><a href="#!">1</a></li>';
+        html += pagerCurrent(1);
       } else {
-        html += pagerLink(1, '1', 'waves-effect');
+        html += pagerLink(1, '1');
       }
       if (windowStart > 2) html += pagerDisabled('&hellip;');
     }
 
     for (let p = windowStart; p <= windowEnd; p++) {
       if (p === current) {
-        html += '<li class="active"><a href="#!">' + p + '</a></li>';
+        html += pagerCurrent(p);
       } else {
-        html += pagerLink(p, String(p), 'waves-effect');
+        html += pagerLink(p, String(p));
       }
     }
 
     if (windowEnd < total) {
       if (windowEnd < total - 1) html += pagerDisabled('&hellip;');
-      html += pagerLink(total, String(total), 'waves-effect');
+      html += pagerLink(total, String(total));
     }
 
     if (current < total) {
-      html += pagerLink(current + 1, '<i class="material-icons">chevron_right</i>', 'waves-effect');
+      html += pagerLink(current + 1, CHEVRON_RIGHT, ' aria-label="Next page"');
     } else {
-      html += pagerDisabled('<i class="material-icons">chevron_right</i>');
+      html += pagerDisabled(CHEVRON_RIGHT);
     }
 
-    html += '</ul></div>';
+    html += '</nav>';
     return html;
   };
 
@@ -155,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const slice = list.slice(start, start + rowsPerPage);
     const pager = renderPager(currentPage, totalPages);
     const rows = slice.map(renderRow).join('');
-    filteredArea.innerHTML = pager + rows + pager;
+    filteredArea.innerHTML = pager + '<div class="doc-list">' + rows + '</div>' + pager;
     filteredArea.hidden = false;
     defaultArea.hidden = true;
 

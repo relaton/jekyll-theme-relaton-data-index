@@ -36,22 +36,36 @@ gem in the `jekyll build` bundle — see `/work/HANDOFFS/relaton__support__data-
 
 ## Theme chrome
 
-The layout is brand-aligned to https://www.relaton.org (Quicksand font + the blue→green brand
-gradient `linear-gradient(135deg, #1f6cf1 0%, #21c197 100%)`). The chrome lives in three
-includes wired up by `_layouts/default.html`: `header.html` (gradient bar — the white swirl-R
-`symbol.svg` inlined so CSS can force `fill:#fff`, the flavor `<h1>` from `site.title`, and a
-`relaton.org →` back-link), `footer.html` (copyright + GitHub, on the **same gradient darkened by
-an `rgba(0,0,0,0.4)` overlay** — relaton.org's footer treatment), and `symbol.svg` (copied
-verbatim from relaton.org's brand assets). Brand tokens + chrome styling live at the top of
-`_sass/style.scss`; content is capped at `max-width: 1050px` and `main a` links are brand-blue —
-these mirror relaton.org's finer chrome. The `$doctype-colors-list` / `$docstage-colors-list`
-maps are **semantic category colors, not brand chrome** — leave them alone.
+The theme mirrors the design system of https://www.relaton.org, which is a **VitePress site**
+(`relaton/relaton.org`, `.vitepress/theme/custom.css` — the upstream source of truth for every
+token below). There is no Materialize and no gradient chrome any more; the whole stylesheet is
+hand-written in `_sass/style.scss` (~14 KB built).
 
-**Row-markup parity invariant:** the per-document `.document.row` markup in `index.html`'s
+- **Tokens.** `:root` / `.dark` custom properties copied from relaton.org: brand `#1f6cf1`,
+  accent `#21c197`, light surfaces `#ffffff`/`#f8fafb`/`#f1f4f7`, dark surfaces
+  `#0b0f13`/`#111820`/`#171f28`, text `#1c2126`/`#3d4854`/`#64748b` (dark:
+  `#e8ecf0`/`#a0aebe`/`#5f7082`), dividers `#e2e8f0`/`#1e2a36`. Content is capped at 1152px,
+  the nav at 1376px — both relaton.org's widths.
+- **Type.** Outfit (400/500/600/700) for the UI, JetBrains Mono for DocIDs. Quicksand is retired.
+- **Chrome.** `header.html` is relaton.org's `.VPNav`: sticky, translucent, `backdrop-filter`
+  blurred, with the blue swirl-R `symbol.svg` (copied verbatim from relaton.org's
+  `public/logo-light.svg` — blue in *both* appearances, do not force it white), the flavor chip,
+  nav links back to relaton.org, the appearance switch and the GitHub mark.
+  `footer.html` is a port of relaton.org's `SiteFooter.vue`.
+- **Appearance.** Light/dark keys off a `.dark` class on `<html>`, VitePress-style. The inline
+  snippet in `head.html` resolves it **before first paint** (localStorage key
+  `relaton-appearance`, values `auto`/`light`/`dark`); `assets/js/appearance.js` only wires the
+  toggle. Any new dark rule must hang off `.dark`.
+- The `$doctype-colors-list` / `$docstage-colors-list` maps are **semantic category colors, not
+  brand chrome** — leave the hues alone. They are rendered as soft badges via `color-mix()`, with
+  `--badge-*-mix` flipping the tint direction per appearance.
+
+**Row-markup parity invariant:** the per-document `.doc-row` markup in `index.html`'s
 `{% for post in paginator.posts %}` loop (server-rendered) is duplicated by
-`assets/js/search.js` `renderRow()` (the client-side filtered view). Any change to one **must**
-be mirrored in the other or the two views diverge. `spec/brand_chrome_spec.rb` is a hermetic
-(file-read, no build) guard for this coupling and the brand palette.
+`assets/js/search.js` `renderRow()` (the client-side filtered view), and `_includes/pager.html`
+is duplicated by `renderPager()`. Any change to one **must** be mirrored in the other or the two
+views diverge. `spec/brand_chrome_spec.rb` is a hermetic (file-read, no build) guard for both
+couplings and for the design tokens.
 
 ## Test / build commands
 
