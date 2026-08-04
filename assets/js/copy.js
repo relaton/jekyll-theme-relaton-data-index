@@ -1,11 +1,19 @@
+// Copy a document's identifier to the clipboard and confirm it in place.
+// (Previously a Materialize tooltip; the theme no longer ships Materialize.)
 document.addEventListener('DOMContentLoaded', () => {
-  const opts = {html: 'Copied!', position: 'top'};
-  const showTooltip = (tooltip) => {
-    tooltip.open();
-    setTimeout(() => {
-      tooltip.close();
-      tooltip.destroy();
-    }, 1000);
+  let timer = null;
+
+  const confirmCopy = (button) => {
+    clearTimeout(timer);
+    button.classList.add('copied');
+    const previous = button.getAttribute('aria-label');
+    button.setAttribute('aria-label', 'Copied');
+    button.setAttribute('title', 'Copied!');
+    timer = setTimeout(() => {
+      button.classList.remove('copied');
+      button.setAttribute('aria-label', previous || 'Copy identifier');
+      button.setAttribute('title', 'Copy identifier');
+    }, 1200);
   };
 
   document.addEventListener('click', (event) => {
@@ -13,8 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!button) return;
     const ref = button.parentElement.querySelector('.reference');
     if (!ref) return;
-    const tooltip = M.Tooltip.init(button, opts);
-    showTooltip(tooltip);
-    navigator.clipboard.writeText(ref.innerText);
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText(ref.innerText.trim())
+      .then(() => confirmCopy(button))
+      .catch((err) => console.error(err));
   });
 });

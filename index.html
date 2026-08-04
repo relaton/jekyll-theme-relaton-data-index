@@ -2,21 +2,24 @@
 layout: default
 ---
 
-<div class="page-intro">
-  <div class="container">
-    <h2>Please use the provided Relaton DocID to refer to an item</h2>
-  </div>
-</div>
-
 <div class="container">
-  <div class="row search-row">
-    <div class="input-field col s12">
-      <i class="material-icons prefix">search</i>
-      <input id="search-input" type="text" autocomplete="off"
-             placeholder="Filter documents by identifier or title"
+  <div class="page-header">
+    <h1>{{ site.title }}</h1>
+    <p class="page-subtitle">Please use the provided Relaton DocID to refer to an item.</p>
+  </div>
+
+  <div class="index-controls">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input id="search-input" class="search-input" type="text" autocomplete="off"
+             aria-label="Filter documents by identifier or title"
+             placeholder="Filter documents by identifier or title&hellip;"
              data-search-url="{{ '/search.json' | relative_url }}"
              data-page-size="{{ site.paginate | default: 100 }}">
-      <label for="search-input" class="active">Filter</label>
     </div>
   </div>
 
@@ -25,28 +28,27 @@ layout: default
   <div id="docs-default">
     {% include pager.html %}
 
-    {% for post in paginator.posts %}
-      <div class="document row">
-        <div class="col s12 l7">
-          <h4 class="reference" style="display: inline-block;">{{ post.ref }}</h4>
-          <i class="tiny material-icons copy-reference" style="cursor: pointer;">content_copy</i>
-        </div>
-        <div class="col s12 l5">
-          <div class="doc-type {{ post.doctype }}">{{ post.doctype }}</div>
-          <div class="doc-stage">{{ post.stage }}</div>
-          <div class="doc-dates">
-            <div class="doc-updated">({{ post.date | date: "%Y-%m-%d" }})</div>
+    <div class="doc-list">
+      {% for post in paginator.posts %}
+        <article class="doc-row">
+          <div class="doc-main">
+            <div class="doc-id-line">
+              <h2 class="reference">{{ post.ref }}</h2>
+              <button type="button" class="copy-reference" aria-label="Copy identifier" title="Copy identifier">
+                {% include copy.svg %}
+              </button>
+            </div>
+            <p class="doc-title">{{ post.content }}</p>
           </div>
-          <div class="right">
-            <a target="_blank" href="{{ post.yaml_ref | relative_url }}">YAML</a>
+          <div class="doc-meta">
+            {% if post.doctype %}<span class="doc-type {{ post.doctype }}">{{ post.doctype }}</span>{% endif %}
+            {% if post.stage %}<span class="doc-stage {{ post.stage }}">{{ post.stage }}</span>{% endif %}
+            {% if post.date %}<time class="doc-date">{{ post.date | date: "%Y-%m-%d" }}</time>{% endif %}
+            <a class="doc-yaml" target="_blank" rel="noopener" href="{{ post.yaml_ref | relative_url }}">YAML</a>
           </div>
-        </div>
-        <div class="col s12">
-          <h5>{{ post.content }}</h5>
-        </div>
-      </div>
-      <div class="divider"></div>
-    {% endfor %}
+        </article>
+      {% endfor %}
+    </div>
 
     {% include pager.html %}
   </div>

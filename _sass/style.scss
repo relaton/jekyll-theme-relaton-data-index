@@ -1,383 +1,422 @@
 @charset "utf-8";
 
-// relaton.org brand tokens
-$primary: #1f6cf1;
-$accent: #21c197;
-$brand-gradient: linear-gradient(135deg, #1f6cf1 0%, #21c197 100%);
+// =============================================================================
+// Relaton data-index design system
+//
+// Mirrors the token set relaton.org ships in
+// `.vitepress/theme/custom.css` (relaton/relaton.org @ main), so a data index
+// reads as the same site as https://www.relaton.org.
+//
+//   Bilateral Ocean  #1F6CF1  primary blue
+//   Suspicious Aqua  #21C197  teal accent
+//   Dazed Aqua       #008A64  deep green
+//   Steamed Tar      #1C2126  near-black
+//
+// Light/dark is driven by a `.dark` class on <html>, exactly as VitePress does
+// it; `_includes/head.html` sets it before first paint and
+// `assets/js/appearance.js` toggles + persists it.
+// =============================================================================
+
+:root {
+  color-scheme: light;
+
+  --c-brand-1: #1f6cf1;
+  --c-brand-2: #4d88f3;
+  --c-brand-soft: rgba(31, 108, 241, 0.1);
+  --c-brand-border: rgba(31, 108, 241, 0.3);
+  --c-brand-border-strong: rgba(31, 108, 241, 0.4);
+  --c-accent: #21c197;
+
+  --c-bg: #ffffff;
+  --c-bg-soft: #f8fafb;
+  --c-bg-mute: #f1f4f7;
+  --c-bg-alt: #f0f4f8;
+
+  --c-text-1: #1c2126;
+  --c-text-2: #3d4854;
+  --c-text-3: #64748b;
+
+  --c-divider: #e2e8f0;
+
+  --nav-bg: rgba(255, 255, 255, 0.85);
+  --nav-height: 64px;
+  --nav-max-width: 1376px; // relaton.org: --vp-layout-max-width - 64px
+  --content-max-width: 1152px; // relaton.org: .VPPage
+
+  // Badge tints. The category hues span from pale (#d183c9) to near-black
+  // (#2e382e), so each badge is pulled toward the opposite end of its surface:
+  // darkened on light, lightened on dark.
+  --badge-bg-mix: 12%;
+  --badge-fg-mix: 78%;
+  --badge-fg-into: #000;
+
+  --font-base: "Outfit", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --c-brand-soft: rgba(31, 108, 241, 0.15);
+
+  --c-bg: #0b0f13;
+  --c-bg-soft: #111820;
+  --c-bg-mute: #171f28;
+  --c-bg-alt: #0e1319;
+
+  --c-text-1: #e8ecf0;
+  --c-text-2: #a0aebe;
+  --c-text-3: #5f7082;
+
+  --c-divider: #1e2a36;
+
+  --nav-bg: rgba(11, 15, 19, 0.85);
+
+  --badge-bg-mix: 20%;
+  --badge-fg-mix: 62%;
+  --badge-fg-into: #fff;
+}
+
+// -----------------------------------------------------------------------------
+// Base
+// -----------------------------------------------------------------------------
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-divider) transparent;
+}
+
+html::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--c-divider);
+  border-radius: 4px;
+}
 
 body {
-  font-family: Quicksand, Verdana, sans-serif;
-  font-weight: 400;
-  color: #000;
+  margin: 0;
   display: flex;
   min-height: 100vh;
   flex-direction: column;
-  font-size: 15px;
+  font-family: var(--font-base);
+  font-size: 16px;
+  font-weight: 400;
   line-height: 1.6;
+  color: var(--c-text-1);
+  background: var(--c-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s, color 0.25s;
 }
 
 main {
   flex: 1 0 auto;
 }
 
-// Content links: brand blue, no underline (relaton.org). Scoped to main so the
-// white header/footer chrome links and the .copyright colors stay untouched.
-main a:link,
-main a:visited {
-  color: $primary;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-base);
+  letter-spacing: -0.02em;
+  color: var(--c-text-1);
+}
+
+a {
+  color: var(--c-brand-1);
   text-decoration: none;
+  transition: color 0.15s;
 }
 
-// relaton.org caps content at ~1050px within the full-bleed chrome bands; this
-// also constrains the header/footer .container inners to the same column.
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgba(31, 108, 241, 0.15);
+  color: var(--c-text-1);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--c-brand-1);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .container {
-  max-width: 1050px;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-
-h2, h3, h4 {
-    font-weight: bold;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    -webkit-font-smoothing: antialiased;
-    font-family: Quicksand, Verdana, sans-serif;
+// -----------------------------------------------------------------------------
+// Nav bar — relaton.org's .VPNav: sticky, translucent, blurred, 1px gutter
+// -----------------------------------------------------------------------------
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--c-divider);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  transition: background-color 0.25s, border-color 0.25s;
 }
 
-// Brand chrome: gradient header + footer bars (relaton.org family)
-.site-header,
-.site-footer {
-  color: #fff;
-}
-
-// The header carries the bright brand gradient; relaton.org's footer is the same
-// gradient darkened by an rgba(0,0,0,0.4) overlay, so it reads as a deep blue-green.
-.site-header {
-  background: $brand-gradient;
-}
-
-.site-footer {
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), $brand-gradient;
-}
-
-.site-header .header-inner,
-.site-footer .footer-inner {
+.nav-wrapper {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1.6rem 0; // ~26px, matching relaton.org's header band
+  justify-content: space-between;
+  gap: 16px;
+  max-width: var(--nav-max-width);
+  height: var(--nav-height);
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-.site-header .site-logo {
-  display: inline-flex;
+.nav-brand {
+  display: flex;
   align-items: center;
-  line-height: 0;
+  gap: 10px;
+  min-width: 0;
 }
 
-.site-header .site-logo svg {
-  height: 48px; // matches relaton.org's header logo
-  width: auto;
+.nav-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-text-1);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
-.site-header .site-logo svg path {
-  fill: #fff; // force the swirl-R mark white on the gradient
+.nav-title:hover {
+  color: var(--c-brand-1);
 }
 
-.site-flavor {
-  margin: 0;
-  font-size: 1.4rem;
+.nav-title svg {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+// The brand mark is the same blue in both appearances, as on relaton.org.
+.nav-title svg path,
+.footer-logo svg path {
+  fill: #1f6cf0;
+}
+
+.nav-flavor {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--c-divider);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c-text-3);
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+}
+
+.nav-menu a {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  line-height: var(--nav-height);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-text-1);
+  transition: color 0.25s;
+}
+
+.nav-menu a:hover {
+  color: var(--c-brand-1);
+}
+
+.nav-social {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--c-text-2);
+  transition: color 0.25s;
+}
+
+.nav-social:hover {
+  color: var(--c-text-1);
+}
+
+.nav-social svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+// Appearance switch — relaton.org's .VPSwitch (40×22 pill, 18px travel)
+.appearance-switch {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 40px;
+  height: 22px;
+  margin: 0 8px;
+  padding: 0;
+  border: 1px solid var(--c-divider);
+  border-radius: 11px;
+  background: var(--c-bg-mute);
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+.appearance-switch:hover {
+  border-color: var(--c-brand-1);
+}
+
+.appearance-switch .switch-check {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  transition: transform 0.25s;
+}
+
+.dark .appearance-switch .switch-check {
+  transform: translateX(18px);
+}
+
+.appearance-switch svg {
+  width: 12px;
+  height: 12px;
+  color: var(--c-text-2);
+}
+
+.appearance-switch .icon-moon,
+.dark .appearance-switch .icon-sun {
+  display: none;
+}
+
+.dark .appearance-switch .icon-moon {
+  display: block;
+}
+
+// -----------------------------------------------------------------------------
+// Page header
+// -----------------------------------------------------------------------------
+
+.page-header {
+  text-align: center;
+  padding: 56px 0 32px;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  font-size: 36px;
   font-weight: 700;
   line-height: 1.2;
 }
 
-.site-backlink {
-  margin-left: auto;
-  color: #fff;
-  font-weight: 700;
+.page-subtitle {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--c-text-2);
 }
 
-.site-footer a {
-  color: #fff;
+// -----------------------------------------------------------------------------
+// Filter field — relaton.org's GridControls search, sized for a page-level field
+// -----------------------------------------------------------------------------
+
+.index-controls {
+  margin: 0 0 20px;
 }
 
-.site-footer .social-links {
-  margin-left: auto;
+.search-wrap {
+  position: relative;
 }
 
-// Light, non-gradient intro strip carrying the instructional line
-.page-intro {
-  background: #f5f7fa;
-  padding: 1.2rem 0;
-
-  h2 {
-    margin: 0;
-    font-size: 1.4rem;
-    font-weight: 500; // relaton.org section-title weight
-    color: #263238;
-  }
-}
-.icon-block {
-  padding: 0 15px;
-}
-.icon-block .material-icons {
-	font-size: inherit;
-}
-.shadow-demo {
-    background-color: #26a69a;
-    width: 100px;
-    height: 100px;
-    margin: 20px auto;
-}
-.col.grid-example {
-    border: 1px solid #eee;
-    margin: 7px 0;
-    text-align: center;
-    line-height: 50px;
-    font-size: 28px;
-    background-color: tomato;
-    color: white;
-    padding: 0;
-}
-.collection .collection-item.avatar {
-    padding-right: 30px;
-}
-.last-post {
-    padding: 10px 0 15px;
-}
-.last-post .collection .collection-item.avatar>.date-post {
-    position: absolute;
-    width: 54px;
-    height: 54px;
-    overflow: hidden;
-    left: 10px;
-    display: inline-block;
-    padding: 16px 0;
-    vertical-align: middle;
-    background: #ad1457;
-    color: #fff;
-    text-align: center;
-}
-.txt-center {
-    text-align: center;
-}
-.post-header time {
-    color: #cacaca;
-    font-size: 0.9em;
-}
-p.rss-subscribe {
-    margin: 0;
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--c-text-3);
+  pointer-events: none;
 }
 
-
-.document {
-  margin-bottom: 0;
+.search-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px 0 46px;
+  border: 1px solid var(--c-divider);
+  border-radius: 12px;
+  background: var(--c-bg);
+  color: var(--c-text-1);
+  font-family: inherit;
+  font-size: 15px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
 }
 
-.document:after {
-  content: "";
-  display: table;
-  clear: both;
+.search-input::placeholder {
+  color: var(--c-text-3);
 }
 
-.document h4, .document h5 {
-  margin-top: 0.4rem;
-}
-
-.document h4 {
-  margin-bottom: 0;
-}
-
-.doc-line {
-  padding-top: 1em;
-}
-
-.doc-line:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-.doc-line .doc-identifier, .doc-line .doc-type-wrap {
-  float: left;
-}
-
-.doc-published, .doc-updated, .doc-identifier,
-.doc-stage, .doc-type, h2, h3 {
-  display: inline-block;
-}
-
-.doc-type-wrap {
-  padding-top: 15px;
-  margin-left: 1em;
-}
-
-.doc-type {
-  padding: 4px 8px;
-  border-radius: 5px;
-  font-size: 0.85em;
-  line-height: 1em;
-  margin-right: 10px;
-  color: white;
-  text-transform: uppercase;
-}
-
-$doctype-colors-list:(
-  standard: #0AC442,
-  directive: #540D6E,
-  guide: #D183C9,
-  specification: #65AFFF,
-  report: #3A405A,
-  amendment: #F26430,
-  corrigendum: #C84630,
-  administrative: #BFAE48,
-  advisory: #BD9391
-);
-
-@each $key,$val in $doctype-colors-list{
-  .doc-type.#{$key} {
-    background-color: #{$val};
-  }
-}
-
-$docstage-colors-list:(
-  proposal: #39A0ED,
-  working-draft: #2D7393,
-  committee-draft: #2A6B7C,
-  draft-standard: #1C7F7A,
-  final-draft: #53C170,
-  published: #069E2D,
-  withdrawn: #004E64,
-  cancelled: #2E382E,
-);
-
-@each $key,$val in $docstage-colors-list{
-  .doc-info.#{$key} {
-    color: #{$val};
-  }
-}
-
-.doc-stage {
-  text-transform: uppercase;
-  font-size: 1em;
-  line-height: 1em;
-
-}
-
-.doc-info {
-  padding-top: 0;
-  padding-bottom: 10px;
-  font-size: 0.9em;
-  line-height: 1em;
-  float: left;
-}
-
-.doc-dates {
-  padding-top: 5px;
-  display: inline-block;
-  margin-left: 0.5em;
-}
-
-.doc-abstract {
-  float: left;
-}
-
-.doc-access, .doc-bib {
-  display: block;
-  float: right;
-}
-
-.doc-access > div {
-  float: left;
-  margin: 5px 10px;
-}
-
-.doc-bib > div {
-  float: left;
-  margin: 5px 10px;
-}
-
-/*
-    4.4 Copyright
-*/
-.copyright {
-  padding: 1em;
-  font-size: 0.9em;
-  text-align: left;
-}
-
-.copyright .name,
-.copyright .address {
-  color: #485094;
-}
-
-
-
-/* Lists */
-main {
-  ul {
-    margin-left: 1.2em;
-  }
-
-  ol {
-    margin-left: 1.2em;
-  }
-
-  ul > li {
-    list-style: none;
-  }
-
-  ul > li:before {
-    content: "—";
-    display: inline-block;
-    width: 1em;
-    margin-left: -1.2em;
-  }
-
-  li p {
-    display: inline;
-  }
-
-  li:first-child {
-    margin-top: 1em;
-  }
-}
-
-/*
-    3.7 Notes
-*/
-.admonitionblock.note {
-  background-color: #fff495;
-  color: #47430c;
-  padding: 0 1em;
-}
-
-/* Index search */
-.search-row {
-  margin-top: 1.5rem;
-  margin-bottom: 0;
-}
-
-// Pill controls to match relaton.org
-.btn,
-.input-field input {
-  border-radius: 25px;
-}
-
-// relaton.org's CTA buttons are bold with a soft focus ring on hover. (700 is the
-// heaviest Quicksand face loaded, so it's what both sites actually render.)
-.btn {
-  font-weight: 700;
-
-  &:hover {
-    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.2);
-  }
-}
-
-.copy-reference {
-  color: $primary;
+.search-input:focus {
+  outline: none;
+  border-color: var(--c-brand-1);
+  box-shadow: 0 0 0 3px var(--c-brand-soft);
 }
 
 .search-status[hidden] {
@@ -385,24 +424,26 @@ main {
 }
 
 .search-info {
-  padding: 0.6rem 1rem;
-  color: #555;
-  font-size: 0.9em;
-  background: #f5f5f5;
-  border-left: 3px solid $primary;
-  margin: 1rem 0;
+  padding: 10px 14px;
+  margin: 0 0 4px;
+  border: 1px solid var(--c-divider);
+  border-left: 3px solid var(--c-brand-1);
+  border-radius: 8px;
+  background: var(--c-bg-soft);
+  color: var(--c-text-2);
+  font-size: 13px;
 }
 
 .search-empty,
 .search-loading {
-  padding: 1rem;
-  color: #757575;
-  font-size: 0.95em;
+  padding: 40px 16px;
+  margin: 16px 0;
+  border: 1px dashed var(--c-divider);
+  border-radius: 12px;
+  background: var(--c-bg-soft);
+  color: var(--c-text-3);
+  font-size: 14px;
   text-align: center;
-  background: #fafafa;
-  border: 1px dashed #e0e0e0;
-  border-radius: 2px;
-  margin: 1rem 0;
 }
 
 .search-loading::before {
@@ -412,13 +453,457 @@ main {
   height: 12px;
   margin-right: 0.5rem;
   vertical-align: middle;
-  border: 2px solid #ccc;
-  border-top-color: $primary;
+  border: 2px solid var(--c-divider);
+  border-top-color: var(--c-brand-1);
   border-radius: 50%;
   animation: search-spin 0.8s linear infinite;
 }
 
 @keyframes search-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
+// -----------------------------------------------------------------------------
+// Document list
+//
+// NOTE: this markup is produced twice — server-side by `index.html` and
+// client-side by `assets/js/search.js` `renderRow()`. Keep both in sync.
+// -----------------------------------------------------------------------------
+
+.doc-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--c-divider);
+}
+
+.doc-row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 14px 16px 14px 18px;
+  border-bottom: 1px solid var(--c-divider);
+  transition: background 0.15s;
+}
+
+// relaton.org's .entry-card: a brand gradient rule slides in on the left edge.
+.doc-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, #1f6cf1, #21c197);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.doc-row:hover {
+  background: var(--c-bg-soft);
+}
+
+.doc-row:hover::before {
+  opacity: 1;
+}
+
+.doc-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.doc-id-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.doc-row .reference {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: var(--c-text-1);
+  overflow-wrap: anywhere;
+}
+
+.copy-reference {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--c-text-3);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.copy-reference svg {
+  width: 14px;
+  height: 14px;
+}
+
+.copy-reference:hover {
+  color: var(--c-brand-1);
+  background: var(--c-brand-soft);
+}
+
+.copy-reference.copied {
+  color: var(--c-accent);
+}
+
+.doc-title {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--c-text-2);
+}
+
+.doc-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.badge,
+.doc-type,
+.doc-stage {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: var(--c-bg-mute);
+  color: var(--c-text-3);
+}
+
+// Semantic category colors — these are content taxonomy, not brand chrome.
+// Each badge tints its own hue; the mix ratios flip with the appearance.
+$doctype-colors-list: (
+  standard: #0ac442,
+  directive: #540d6e,
+  guide: #d183c9,
+  specification: #65afff,
+  report: #3a405a,
+  amendment: #f26430,
+  corrigendum: #c84630,
+  administrative: #bfae48,
+  advisory: #bd9391,
+);
+
+$docstage-colors-list: (
+  proposal: #39a0ed,
+  working-draft: #2d7393,
+  committee-draft: #2a6b7c,
+  draft-standard: #1c7f7a,
+  final-draft: #53c170,
+  published: #069e2d,
+  withdrawn: #004e64,
+  cancelled: #2e382e,
+);
+
+@each $key, $val in $doctype-colors-list {
+  .doc-type.#{$key} {
+    --badge-c: #{$val};
+
+    background: color-mix(in srgb, var(--badge-c) var(--badge-bg-mix), transparent);
+    color: color-mix(in srgb, var(--badge-c) var(--badge-fg-mix), var(--badge-fg-into));
+  }
+}
+
+@each $key, $val in $docstage-colors-list {
+  .doc-stage.#{$key} {
+    --badge-c: #{$val};
+
+    background: color-mix(in srgb, var(--badge-c) var(--badge-bg-mix), transparent);
+    color: color-mix(in srgb, var(--badge-c) var(--badge-fg-mix), var(--badge-fg-into));
+  }
+}
+
+.doc-date {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text-3);
+  white-space: nowrap;
+}
+
+.doc-yaml {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid var(--c-divider);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--c-text-3);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.doc-yaml:hover {
+  color: var(--c-brand-1);
+  border-color: var(--c-brand-border-strong);
+}
+
+@media (max-width: 720px) {
+  .doc-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .doc-meta {
+    justify-content: flex-start;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Pagination
+// -----------------------------------------------------------------------------
+
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 24px 0;
+}
+
+.pager-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-text-2);
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.pager-item svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pager-item:hover {
+  background: var(--c-bg-soft);
+  border-color: var(--c-divider);
+  color: var(--c-brand-1);
+}
+
+.pager-item.active {
+  background: var(--c-brand-1);
+  border-color: var(--c-brand-1);
+  color: #fff;
+}
+
+.pager-item.disabled {
+  color: var(--c-text-3);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+// -----------------------------------------------------------------------------
+// Footer — relaton.org's SiteFooter.vue
+// -----------------------------------------------------------------------------
+
+.site-footer {
+  flex-shrink: 0;
+  background: var(--c-bg-soft);
+  border-top: 1px solid var(--c-divider);
+}
+
+.footer-inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 48px 24px 32px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--c-text-1);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.footer-logo svg {
+  width: 28px;
+  height: 28px;
+}
+
+.footer-tagline {
+  max-width: 280px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--c-text-3);
+}
+
+.footer-social {
+  display: flex;
+  gap: 8px;
+}
+
+.footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--c-text-3);
+  transition: color 0.15s, background 0.15s;
+}
+
+.footer-social-link svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.footer-social-link:hover {
+  color: var(--c-text-1);
+  background: var(--c-bg);
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer-heading {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c-text-2);
+}
+
+.footer-col a {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--c-text-3);
+}
+
+.footer-col a:hover {
+  color: var(--c-text-1);
+}
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 24px;
+  border-top: 1px solid var(--c-divider);
+  font-size: 13px;
+  color: var(--c-text-3);
+}
+
+.footer-bottom a {
+  color: var(--c-text-2);
+}
+
+.footer-bottom a:hover {
+  color: var(--c-text-1);
+}
+
+.footer-divider {
+  margin: 0 8px;
+}
+
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-divider {
+    display: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Narrow viewports
+// -----------------------------------------------------------------------------
+
+@media (max-width: 860px) {
+  .nav-menu,
+  .nav-flavor {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .page-header {
+    padding: 36px 0 24px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+  }
+
+  .page-subtitle {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doc-row,
+  .doc-row::before,
+  .appearance-switch .switch-check {
+    transition: none;
+  }
+}

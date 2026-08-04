@@ -7,68 +7,48 @@
 {% assign window_end = current | plus: window %}
 {% if window_end > total %}{% assign window_end = total %}{% endif %}
 
-<div class="center-align">
-  <ul class="pagination">
-    {% if paginator.previous_page %}
-      {% assign prev_class = 'waves-effect' %}
-      {% assign prev_url = paginator.previous_page_path %}
+{% capture chevron_left %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>{% endcapture %}
+{% capture chevron_right %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>{% endcapture %}
+
+<nav class="pager" aria-label="Pagination">
+  {% if paginator.previous_page %}
+    <a class="pager-item" href="{{ paginator.previous_page_path | relative_url }}" aria-label="Previous page">{{ chevron_left }}</a>
+  {% else %}
+    <span class="pager-item disabled" aria-hidden="true">{{ chevron_left }}</span>
+  {% endif %}
+
+  {% if window_start > 1 %}
+    {% if current == 1 %}
+      <span class="pager-item active" aria-current="page">1</span>
     {% else %}
-      {% assign prev_class = 'disabled' %}
-      {% assign prev_url = '#!' %}
+      <a class="pager-item" href="{{ '/' | relative_url }}">1</a>
     {% endif %}
-    <li class="{{ prev_class }}">
-      <a href="{{ prev_url | relative_url }}">
-        <i class="material-icons">chevron_left</i>
-      </a>
-    </li>
-
-    {% if window_start > 1 %}
-      {% if current == 1 %}
-        <li class="active"><a href="#!">1</a></li>
-      {% else %}
-        <li class="waves-effect"><a href="{{ '/' | relative_url }}">1</a></li>
-      {% endif %}
-      {% if window_start > 2 %}
-        <li class="disabled"><a href="#!">&hellip;</a></li>
-      {% endif %}
+    {% if window_start > 2 %}
+      <span class="pager-item disabled" aria-hidden="true">&hellip;</span>
     {% endif %}
+  {% endif %}
 
-    {% for page in (window_start..window_end) %}
-      {% if page == current %}
-        {% assign page_class = 'active' %}
-        {% assign page_url = '#!' %}
-      {% elsif page == 1 %}
-        {% assign page_class = 'waves-effect' %}
-        {% assign page_url = '/' | relative_url %}
-      {% else %}
-        {% assign page_class = 'waves-effect' %}
-        {% assign page_url = site.paginate_path | relative_url | replace: ':num', page %}
-      {% endif %}
-      <li class="{{ page_class }}">
-        <a href="{{ page_url }}">{{ page }}</a>
-      </li>
-    {% endfor %}
-
-    {% assign last_minus_one = total | minus: 1 %}
-    {% if window_end < total %}
-      {% if window_end < last_minus_one %}
-        <li class="disabled"><a href="#!">&hellip;</a></li>
-      {% endif %}
-      {% assign last_url = site.paginate_path | relative_url | replace: ':num', total %}
-      <li class="waves-effect"><a href="{{ last_url }}">{{ total }}</a></li>
-    {% endif %}
-
-    {% if paginator.next_page %}
-      {% assign next_class = 'waves-effect' %}
-      {% assign next_url = paginator.next_page_path %}
+  {% for page in (window_start..window_end) %}
+    {% if page == current %}
+      <span class="pager-item active" aria-current="page">{{ page }}</span>
+    {% elsif page == 1 %}
+      <a class="pager-item" href="{{ '/' | relative_url }}">1</a>
     {% else %}
-      {% assign next_class = 'disabled' %}
-      {% assign next_url = '#!' %}
+      <a class="pager-item" href="{{ site.paginate_path | relative_url | replace: ':num', page }}">{{ page }}</a>
     {% endif %}
-    <li class="{{ next_class }}">
-      <a href="{{ next_url | relative_url }}">
-        <i class="material-icons">chevron_right</i>
-      </a>
-    </li>
-  </ul>
-</div>
+  {% endfor %}
+
+  {% assign last_minus_one = total | minus: 1 %}
+  {% if window_end < total %}
+    {% if window_end < last_minus_one %}
+      <span class="pager-item disabled" aria-hidden="true">&hellip;</span>
+    {% endif %}
+    <a class="pager-item" href="{{ site.paginate_path | relative_url | replace: ':num', total }}">{{ total }}</a>
+  {% endif %}
+
+  {% if paginator.next_page %}
+    <a class="pager-item" href="{{ paginator.next_page_path | relative_url }}" aria-label="Next page">{{ chevron_right }}</a>
+  {% else %}
+    <span class="pager-item disabled" aria-hidden="true">{{ chevron_right }}</span>
+  {% endif %}
+</nav>

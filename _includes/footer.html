@@ -1,8 +1,41 @@
-<div class="site-footer">
-  <div class="container footer-inner">
-    <span class="copyright">&copy; {{ 'now' | date: "%Y" }} Ribose Group Inc. &mdash; All rights reserved.</span>
-    <nav class="social-links" aria-label="social">
-      <a href="https://github.com/relaton/relaton">GitHub</a>
-    </nav>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          {% include symbol.svg %}
+          <span class="footer-name">Relaton</span>
+        </div>
+        <p class="footer-tagline">The machine-readable bibliographic data model, based on ISO&nbsp;690:2021.</p>
+        <div class="footer-social">
+          <a class="footer-social-link" href="https://github.com/relaton" target="_blank"
+             rel="noopener noreferrer" title="GitHub" aria-label="Relaton on GitHub">
+            {% include github.svg %}
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h2 class="footer-heading">Relaton</h2>
+        <a href="https://www.relaton.org/model/">The Relaton Model</a>
+        <a href="https://www.relaton.org/flavors/">Flavors</a>
+        <a href="https://www.relaton.org/software/">Software</a>
+        <a href="https://www.relaton.org/api/">API Demo</a>
+      </div>
+
+      <div class="footer-col">
+        <h2 class="footer-heading">This index</h2>
+        <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
+        <a href="{{ '/search.json' | relative_url }}">Index JSON</a>
+        <a href="https://www.relaton.org/specs/relaton-yaml">Relaton YAML</a>
+        <a href="https://github.com/relaton" target="_blank" rel="noopener noreferrer">Data repositories</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>An open source project by <a href="https://www.ribose.com" target="_blank" rel="noopener noreferrer">Ribose</a></span>
+      <span class="footer-divider" aria-hidden="true">&middot;</span>
+      <span class="copyright">&copy; {{ 'now' | date: "%Y" }} Ribose Group Inc. &mdash; All rights reserved.</span>
+    </div>
   </div>
-</div>
+</footer>

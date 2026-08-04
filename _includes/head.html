@@ -1,15 +1,31 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title | escape }}{% endif %}</title>
     <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}" />
+    <meta name="theme-color" content="#1F6CF1" />
 
 	<link rel="shortcut icon" href="{{ site.favicon }}" type="image/vnd.microsoft.icon" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Quicksand:400,500,700" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" media="screen,projection" href="{{ "/assets/css/materialize.css" | relative_url }}" />
+
+    <!-- relaton.org's typefaces: Outfit for the UI, JetBrains Mono for identifiers. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Resolve the appearance before first paint so dark mode never flashes white. -->
+    <script>
+      (function () {
+        try {
+          var pref = localStorage.getItem('relaton-appearance') || 'auto';
+          var dark = pref === 'dark' ||
+            (pref !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
+
     <link rel="stylesheet" type="text/css" media="screen,projection" href="{{ "/assets/css/main.css" | relative_url }}">
-    <script src="{{ "/assets/js/materialize.min.js" | relative_url }}"></script>
+    <script src="{{ "/assets/js/appearance.js" | relative_url }}"></script>
     <script src="{{ "/assets/js/copy.js" | relative_url }}"></script>
     <script src="{{ "/assets/js/search.js" | relative_url }}"></script>
     <link rel="prefetch" href="{{ '/search.json' | relative_url }}">
