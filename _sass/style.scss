@@ -8,6 +8,7 @@ $brand-gradient: linear-gradient(135deg, #1f6cf1 0%, #21c197 100%);
 body {
   font-family: Quicksand, Verdana, sans-serif;
   font-weight: 400;
+  color: #000;
   display: flex;
   min-height: 100vh;
   flex-direction: column;
@@ -19,6 +20,20 @@ body {
 
 main {
   flex: 1 0 auto;
+}
+
+// Content links: brand blue, no underline (relaton.org). Scoped to main so the
+// white header/footer chrome links and the .copyright colors stay untouched.
+main a:link,
+main a:visited {
+  color: $primary;
+  text-decoration: none;
+}
+
+// relaton.org caps content at ~1050px within the full-bleed chrome bands; this
+// also constrains the header/footer .container inners to the same column.
+.container {
+  max-width: 1050px;
 }
 
 
@@ -34,8 +49,17 @@ h1, h2, h3, h4, h5, h6 {
 // Brand chrome: gradient header + footer bars (relaton.org family)
 .site-header,
 .site-footer {
-  background: $brand-gradient;
   color: #fff;
+}
+
+// The header carries the bright brand gradient; relaton.org's footer is the same
+// gradient darkened by an rgba(0,0,0,0.4) overlay, so it reads as a deep blue-green.
+.site-header {
+  background: $brand-gradient;
+}
+
+.site-footer {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), $brand-gradient;
 }
 
 .site-header .header-inner,
@@ -44,7 +68,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  padding: 0.8rem 0;
+  padding: 1.6rem 0; // ~26px, matching relaton.org's header band
 }
 
 .site-header .site-logo {
@@ -54,7 +78,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .site-header .site-logo svg {
-  height: 40px;
+  height: 48px; // matches relaton.org's header logo
   width: auto;
 }
 
@@ -91,6 +115,7 @@ h1, h2, h3, h4, h5, h6 {
   h2 {
     margin: 0;
     font-size: 1.4rem;
+    font-weight: 500; // relaton.org section-title weight
     color: #263238;
   }
 }
@@ -339,6 +364,16 @@ main {
 .btn,
 .input-field input {
   border-radius: 25px;
+}
+
+// relaton.org's CTA buttons are bold with a soft focus ring on hover. (700 is the
+// heaviest Quicksand face loaded, so it's what both sites actually render.)
+.btn {
+  font-weight: 700;
+
+  &:hover {
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.2);
+  }
 }
 
 .copy-reference {
