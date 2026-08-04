@@ -40,10 +40,12 @@ The layout is brand-aligned to https://www.relaton.org (Quicksand font + the blu
 gradient `linear-gradient(135deg, #1f6cf1 0%, #21c197 100%)`). The chrome lives in three
 includes wired up by `_layouts/default.html`: `header.html` (gradient bar — the white swirl-R
 `symbol.svg` inlined so CSS can force `fill:#fff`, the flavor `<h1>` from `site.title`, and a
-`relaton.org →` back-link), `footer.html` (gradient bar — copyright + GitHub), and `symbol.svg`
-(copied verbatim from relaton.org's brand assets). Brand tokens + chrome styling live at the top
-of `_sass/style.scss`; the `$doctype-colors-list` / `$docstage-colors-list` maps are **semantic
-category colors, not brand chrome** — leave them alone.
+`relaton.org →` back-link), `footer.html` (copyright + GitHub, on the **same gradient darkened by
+an `rgba(0,0,0,0.4)` overlay** — relaton.org's footer treatment), and `symbol.svg` (copied
+verbatim from relaton.org's brand assets). Brand tokens + chrome styling live at the top of
+`_sass/style.scss`; content is capped at `max-width: 1050px` and `main a` links are brand-blue —
+these mirror relaton.org's finer chrome. The `$doctype-colors-list` / `$docstage-colors-list`
+maps are **semantic category colors, not brand chrome** — leave them alone.
 
 **Row-markup parity invariant:** the per-document `.document.row` markup in `index.html`'s
 `{% for post in paginator.posts %}` loop (server-rendered) is duplicated by

@@ -39,4 +39,24 @@ RSpec.describe "brand chrome" do
       expect(style_scss).to include("linear-gradient(135deg, #1f6cf1 0%, #21c197 100%)")
     end
   end
+
+  describe "relaton.org chrome refinements" do
+    style_scss = File.read(File.join(root, "_sass", "style.scss"))
+
+    it "darkens the footer with relaton.org's rgba(0, 0, 0, 0.4) overlay" do
+      # relaton.org's footer is a rgba(0,0,0,0.4) overlay over the gradient, not
+      # the bright gradient itself. The overlay layers in front of $brand-gradient.
+      expect(style_scss).to match(/rgba\(0,\s*0,\s*0,\s*0\.4\)/)
+    end
+
+    it "sets the body text color to #000 to match relaton.org" do
+      expect(style_scss).to match(/color:\s*#000\b/)
+    end
+
+    it "colors content links with the brand primary and no underline" do
+      # Scoped to main so the white header/footer chrome links stay untouched.
+      expect(style_scss).to match(/main a[^{]*\{[^}]*color:\s*\$primary/m)
+      expect(style_scss).to match(/main a[^{]*\{[^}]*text-decoration:\s*none/m)
+    end
+  end
 end
